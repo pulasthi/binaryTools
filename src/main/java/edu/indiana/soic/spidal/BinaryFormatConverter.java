@@ -2,10 +2,7 @@ package edu.indiana.soic.spidal;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
-import java.nio.ShortBuffer;
+import java.nio.*;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -56,21 +53,65 @@ public class BinaryFormatConverter {
             }
             fc.read(byteBuffer);
             byteBuffer.flip();
-            
-            ShortBuffer shortBuffer = byteBuffer.asShortBuffer();
-            short[] array = new short[(int)fc.size()/2];
-            shortBuffer.get(array);
 
-            byteBuffer.clear();
-
-            if(endianness.equals(ByteOrder.BIG_ENDIAN)){
-                byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-            }else{
-                byteBuffer.order(ByteOrder.BIG_ENDIAN);
+            Buffer buffer = null;
+            switch (dataType){
+                case "short":
+                    buffer = byteBuffer.asShortBuffer();
+                    short[] shortArray = new short[(int)fc.size()/2];
+                    ((ShortBuffer)buffer).get(shortArray);
+                    byteBuffer.clear();
+                    byteBuffer = endianness.equals(ByteOrder.BIG_ENDIAN) ? byteBuffer.order(ByteOrder.LITTLE_ENDIAN) :
+                            byteBuffer.order(ByteOrder.BIG_ENDIAN);
+                    ShortBuffer shortOutputBuffer = byteBuffer.asShortBuffer();
+                    shortOutputBuffer.put(shortArray);
+                    break;
+                case "int":
+                    buffer = byteBuffer.asIntBuffer();
+                    int[] intArray = new int[(int)fc.size()/4];
+                    ((IntBuffer)buffer).get(intArray);
+                    byteBuffer.clear();
+                    byteBuffer = endianness.equals(ByteOrder.BIG_ENDIAN) ? byteBuffer.order(ByteOrder.LITTLE_ENDIAN) :
+                            byteBuffer.order(ByteOrder.BIG_ENDIAN);
+                    IntBuffer intOutputBuffer = byteBuffer.asIntBuffer();
+                    intOutputBuffer.put(intArray);
+                    break;
+                case "double":
+                    buffer = byteBuffer.asDoubleBuffer();
+                    double[] doubleArray = new double[(int)fc.size()/8];
+                    ((DoubleBuffer)buffer).get(doubleArray);
+                    byteBuffer.clear();
+                    byteBuffer = endianness.equals(ByteOrder.BIG_ENDIAN) ? byteBuffer.order(ByteOrder.LITTLE_ENDIAN) :
+                            byteBuffer.order(ByteOrder.BIG_ENDIAN);
+                    DoubleBuffer doubleOutputBuffer = byteBuffer.asDoubleBuffer();
+                    doubleOutputBuffer.put(doubleArray);
+                    break;
+                case "long":
+                    buffer = byteBuffer.asLongBuffer();
+                    long[] longArray = new long[(int)fc.size()/8];
+                    ((LongBuffer)buffer).get(longArray);
+                    byteBuffer.clear();
+                    byteBuffer = endianness.equals(ByteOrder.BIG_ENDIAN) ? byteBuffer.order(ByteOrder.LITTLE_ENDIAN) :
+                            byteBuffer.order(ByteOrder.BIG_ENDIAN);
+                    LongBuffer longOutputBuffer = byteBuffer.asLongBuffer();
+                   longOutputBuffer.put(longArray);
+                    break;
+                case "float":
+                    buffer = byteBuffer.asFloatBuffer();
+                    float[] floatArray = new float[(int)fc.size()/4];
+                    ((FloatBuffer)buffer).get(floatArray);
+                    byteBuffer.clear();
+                    byteBuffer = endianness.equals(ByteOrder.BIG_ENDIAN) ? byteBuffer.order(ByteOrder.LITTLE_ENDIAN) :
+                            byteBuffer.order(ByteOrder.BIG_ENDIAN);
+                    FloatBuffer floatOutputBuffer = byteBuffer.asFloatBuffer();
+                    floatOutputBuffer.put(floatArray);
+                    break;
+                case "byte":
+                    byteBuffer = endianness.equals(ByteOrder.BIG_ENDIAN) ? byteBuffer.order(ByteOrder.LITTLE_ENDIAN) :
+                        byteBuffer.order(ByteOrder.BIG_ENDIAN);
+                    break;
             }
 
-            ShortBuffer myShortBuffer = byteBuffer.asShortBuffer();
-            myShortBuffer.put(array);
             FileChannel out = new FileOutputStream(outputfilename).getChannel();
             out.write(byteBuffer);
             out.close();
@@ -78,4 +119,18 @@ public class BinaryFormatConverter {
             e.printStackTrace();
         }
     }
+
+    private static Buffer getAsTypeBuffer(String dataType, ByteBuffer byteBuffer) {
+        switch (dataType){
+            case "short": return byteBuffer.asShortBuffer();
+            case "int": return byteBuffer.asIntBuffer();
+            case "double": return byteBuffer.asDoubleBuffer();
+            case "long": return byteBuffer.asLongBuffer();
+            case "float": return byteBuffer.asFloatBuffer();
+            case "byte": return byteBuffer;
+            default: return byteBuffer.asShortBuffer();
+        }
+    }
+
+
 }
