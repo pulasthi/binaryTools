@@ -1,0 +1,1 @@
+This project allows users to convert binary files between byte order types. Converts binary files between Big-endian and Little-endian.
