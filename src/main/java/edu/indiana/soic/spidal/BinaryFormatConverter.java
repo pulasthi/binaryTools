@@ -53,7 +53,7 @@ public class BinaryFormatConverter {
             fc.read(byteBuffer);
             byteBuffer.flip();
 
-            Buffer buffer = null;
+            Buffer buffer;
             switch (dataType){
                 case "short":
                     buffer = byteBuffer.asShortBuffer();
@@ -118,18 +118,4 @@ public class BinaryFormatConverter {
             e.printStackTrace();
         }
     }
-
-    private static Buffer getAsTypeBuffer(String dataType, ByteBuffer byteBuffer) {
-        switch (dataType){
-            case "short": return byteBuffer.asShortBuffer();
-            case "int": return byteBuffer.asIntBuffer();
-            case "double": return byteBuffer.asDoubleBuffer();
-            case "long": return byteBuffer.asLongBuffer();
-            case "float": return byteBuffer.asFloatBuffer();
-            case "byte": return byteBuffer;
-            default: return byteBuffer.asShortBuffer();
-        }
-    }
-
-
 }
