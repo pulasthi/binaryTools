@@ -37,26 +37,10 @@ public class BinaryFormatConverter {
         String outputfile = args[1];
         endianness =  args[2].equals("big") ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
-        switch (args[3]){
-            case "short": dataTypeSize = Short.BYTES;
-                break;
-            case "int": dataTypeSize = Integer.BYTES;
-                break;
-            case "double": dataTypeSize = Double.BYTES;
-                break;
-            case "long": dataTypeSize = Long.BYTES;
-                break;
-            case "float": dataTypeSize = Float.BYTES;
-                break;
-            case "byte": dataTypeSize = Byte.BYTES;
-                break;
-            default: dataTypeSize = Short.BYTES;
-        }
-
-        ConvertFormat(file,outputfile,endianness,dataTypeSize,args[3]);
+        ConvertFormat(file,outputfile,endianness,args[3]);
     }
 
-    private static void ConvertFormat(String filename, String outputfilename, ByteOrder endianness, int dataTypeSize, String dataType) {
+    private static void ConvertFormat(String filename, String outputfilename, ByteOrder endianness, String dataType) {
         try(FileChannel fc = (FileChannel) Files
                 .newByteChannel(Paths.get(filename), StandardOpenOption.READ)) {
             ByteBuffer byteBuffer = ByteBuffer.allocate((int)fc.size());
